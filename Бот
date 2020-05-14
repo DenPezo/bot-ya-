@@ -1,4 +1,4 @@
-// ==UserScript==
+// ==UserScript==// ==UserScript==
 // @name         Bot for google
 // @namespace    http://tampermonkey.net/
 // @version      0.1
@@ -9,15 +9,21 @@
 // ==/UserScript==
 
 let button__text=document.getElementsByClassName("button mini-suggest__button button_theme_websearch button_size_ws-head i-bem")[0];
+let keywords = ["Гобой", "Как звучит флейта", "Что такое валторна", "Как выглядит тромбон", "Музыкальные диктанты онлайн", "Виолончель"];
+let keyword = keywords[getRandom(0,keywords.length)];
 
 if (button__text != undefined){
-    document.getElementById('text').value='Гобой';
-    button__text.click();
+    document.getElementById('text').value=keyword;
+    setTimeout(()=>button__text.click(), getRandom(3000,10000));
 }
 
 let links = document.links;
 for(let i=0;i<links.length;i++){
     if (links[i].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai") !=-1){
-      links[i].click();
-      break;}
+        let link = links[i];
+        setTimeout(()=>link.click(), getRandom(3000,10000));
+        break;}
+}
+function getRandom(min,max){
+    return Math.floor(Math.random()*(max-min)+min);
 }
