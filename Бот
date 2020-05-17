@@ -1,10 +1,11 @@
-// ==UserScript==// ==UserScript==
-// @name         Bot for google
+// ==UserScript==
+// @name         Bot for Yandex
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
 // @match        https://yandex.ru/*
+// @match        https://xn----7sbab5aqcbiddtdj1e1g.xn--p1ai/*
 // @grant        none
 // ==/UserScript==
 
@@ -12,18 +13,54 @@ let button__text=document.getElementsByClassName("button mini-suggest__button bu
 let keywords = ["Гобой", "Как звучит флейта", "Что такое валторна", "Как выглядит тромбон", "Музыкальные диктанты онлайн", "Виолончель"];
 let keyword = keywords[getRandom(0,keywords.length)];
 
+
 if (button__text != undefined){
-    document.getElementById('text').value=keyword;
-    setTimeout(()=>button__text.click(), getRandom(3000,10000));
+    writeWord(keyword);
 }
 
 let links = document.links;
-for(let i=0;i<links.length;i++){
-    if (links[i].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai") !=-1){
-        let link = links[i];
-        setTimeout(()=>link.click(), getRandom(3000,10000));
-        break;}
+
+if (location.host=="yandex.ru"){
+   getYaPage();
+}
+else {
+    if (getRandom(0,100)>30){
+        let index=getRandom(0,links.length);
+        if (links[index].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai") !=-1)
+            setTimeout(()=>{links[index].click();},getRandom(3000,10000));
+        else location.href='https://xn----7sbab5aqcbiddtdj1e1g.xn--p1ai/';
+    }
+    else location.href='https://yandex.ru/';
 }
 function getRandom(min,max){
     return Math.floor(Math.random()*(max-min)+min);
 }
+function writeWord(keyword){
+  let i = 0;
+  let timerId = setInterval(()=>{
+    document.getElementById('text').value += keyword[i];
+    i++;
+    if (i==keyword.length){
+        clearInterval(timerId);
+        button__text.click();
+    }
+  },300);
+}
+
+function getYaPage() {
+    let next = true;
+    for(let i=0;i<links.length;i++){
+        if (links[i].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai") !=-1){
+            links[i].removeAttribute('target');
+            let link = links[i];
+            next = false;
+            setTimeout(()=>link.click(), getRandom(3000,10000));
+            break;
+        }
+    }
+    if (next) setTimeout(()=>{
+        if (document.getElementsByClassName("pager__item pager__item_current_yes pager__item_kind_page")[0].innerText==10) document.getElementsByClassName('logo')[0].click();
+        else document.getElementsByClassName("link_theme_none link_target_serp pager__item pager__item_kind_next i-bem")[0].click();
+    },getRandom(3000,10000));
+}
+
