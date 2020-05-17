@@ -6,30 +6,40 @@
 // @author       You
 // @match        https://yandex.ru/*
 // @match        https://xn----7sbab5aqcbiddtdj1e1g.xn--p1ai/*
+// @match        https://crushdrummers.ru/*
 // @grant        none
 // ==/UserScript==
 
-let button__text=document.getElementsByClassName("button mini-suggest__button button_theme_websearch button_size_ws-head i-bem")[0];
-let keywords = ["Гобой", "Как звучит флейта", "Что такое валторна", "Как выглядит тромбон", "Музыкальные диктанты онлайн", "Виолончель"];
-let keyword = keywords[getRandom(0,keywords.length)];
-
-
-if (button__text != undefined){
-    writeWord(keyword);
-}
-
 let links = document.links;
+let site = location.host;
 
 if (location.host=="yandex.ru"){
-   getYaPage();
+    let sites = {
+    "xn----7sbab5aqcbiddtdj1e1g.xn--p1ai":["Гобой", "Как звучит флейта", "Что такое валторна", "Как выглядит тромбон", "Музыкальные диктанты онлайн", "Виолончель"],
+    "crushdrummers.ru":["Барабанное шоу","Шоу барабанщиков москва","Заказать барабанное шоу"]
+    }
+
+    var button__text=document.getElementsByClassName("button mini-suggest__button button_theme_websearch button_size_ws-head i-bem")[0];
+
+    if (button__text != undefined){
+        site = Object.keys(sites)[getRandom(0,Object.keys(sites).length)];
+        let keywords = sites[site];
+        let keyword = keywords[getRandom(0,keywords.length)];
+        document.cookie = "site="+site;
+        writeWord(keyword);
+    }
+    else {
+        site = getCookie('site');
+    }
+    getYaPage();
 }
 else {
     if (getRandom(0,100)>30){
         let index=getRandom(0,links.length);
-        if (links[index].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai") !=-1)
+        if (links[index].href.indexOf(site) !=-1)
             setTimeout(()=>{links[index].click();},getRandom(3000,10000));
-        else location.href='https://xn----7sbab5aqcbiddtdj1e1g.xn--p1ai/';
-    }
+        else location.href=`https://${site}/`;//-это тоже,что location.href="https://"+site+"/"
+     }
     else location.href='https://yandex.ru/';
 }
 function getRandom(min,max){
@@ -50,17 +60,24 @@ function writeWord(keyword){
 function getYaPage() {
     let next = true;
     for(let i=0;i<links.length;i++){
-        if (links[i].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai") !=-1){
+        if (links[i].href.indexOf(site) !=-1){
             links[i].removeAttribute('target');
             let link = links[i];
+            setTimeout(()=>{link.scrollIntoView(true);},2000);
             next = false;
             setTimeout(()=>link.click(), getRandom(3000,10000));
             break;
         }
     }
+
     if (next) setTimeout(()=>{
         if (document.getElementsByClassName("pager__item pager__item_current_yes pager__item_kind_page")[0].innerText==10) document.getElementsByClassName('logo')[0].click();
         else document.getElementsByClassName("link_theme_none link_target_serp pager__item pager__item_kind_next i-bem")[0].click();
     },getRandom(3000,10000));
 }
-
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+ }
