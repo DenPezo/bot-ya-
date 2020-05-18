@@ -20,7 +20,6 @@ if (location.host=="yandex.ru"){
     }
 
     var button__text=document.getElementsByClassName("button mini-suggest__button button_theme_websearch button_size_ws-head i-bem")[0];
-
     if (button__text != undefined){
         site = Object.keys(sites)[getRandom(0,Object.keys(sites).length)];
         let keywords = sites[site];
@@ -36,7 +35,7 @@ if (location.host=="yandex.ru"){
 else {
     if (getRandom(0,100)>30){
         let index=getRandom(0,links.length);
-        if (links[index].href.indexOf(site) !=-1)
+        if (links[index].href.indexOf(site) !=-1 && links[index].href.indexOf('#')==-1 && links[index].href.indexOf('.jpg')==-1)
             setTimeout(()=>{links[index].click();},getRandom(3000,10000));
         else location.href=`https://${site}/`;//-это тоже,что location.href="https://"+site+"/"
      }
@@ -45,15 +44,18 @@ else {
 function getRandom(min,max){
     return Math.floor(Math.random()*(max-min)+min);
 }
+
 function writeWord(keyword){
   let i = 0;
   let timerId = setInterval(()=>{
-    document.getElementById('text').value += keyword[i];
-    i++;
-    if (i==keyword.length){
-        clearInterval(timerId);
-        button__text.click();
+      setTimeout(()=>{
+          document.getElementById('text').value += keyword[i]==undefined?'':keyword[i];
+          i++;
+          if (i==keyword.length){
+          clearInterval(timerId);
+          button__text.click();
     }
+    }, getRandom(0,1000));
   },300);
 }
 
